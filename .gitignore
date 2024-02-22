@@ -1,2 +1,2 @@
-/mysql_keycloak_data/
-/realms
+/mysql_*
+/realms/
