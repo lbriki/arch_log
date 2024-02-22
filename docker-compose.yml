@@ -31,7 +31,16 @@ services:
       - "3308:3306"
     restart: always
 
-
+  mongo:
+    container_name: mongo
+    image: mongo:latest
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    expose:
+      - "27017"
+    volumes:
+      - ./mongo-data:/data/db
 
   # Keycloak Config (MySQL Database)
   keycloak-mysql:
