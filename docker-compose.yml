@@ -1,6 +1,38 @@
 ---
 version: "3"
 services:
+  # MySQL Config for order service
+  mysql-order:
+    container_name: mysql-order
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: order_service
+      MYSQL_USER: changeme
+      MYSQL_PASSWORD: password
+    volumes:
+      - ./mysql_order:/var/lib/mysql
+    ports:
+      - "3307:3306"
+    restart: always
+
+  # MySQL Config for inventory service
+  mysql-inventory:
+    container_name: mysql-inventory
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: inventory_service
+      MYSQL_USER: changeme
+      MYSQL_PASSWORD: password
+    volumes:
+      - ./mysql_inventory:/var/lib/mysql
+    ports:
+      - "3308:3306"
+    restart: always
+
+
+
   # Keycloak Config (MySQL Database)
   keycloak-mysql:
     container_name: keycloak-mysql
@@ -132,6 +164,7 @@ services:
       - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
       - SPRING_KAFKA_BOOTSTRAPSERVERS=broker:29092
     depends_on:
+      - mysql-order
       - broker
       - zipkin
       - discovery-server
@@ -143,13 +176,14 @@ services:
     image: lbriki/inventory-service:latest
     pull_policy: always
     environment:
-      - SPRING_DATASOURCE_URL=
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-inventory:3306/inventory_service?allowPublicKeyRetrieval=true&useSSL=false
       - SPRING_DATASOURCE_USERNAME=changeme
       - SPRING_DATASOURCE_PASSWORD=password
       - SERVER_PORT=8080
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka/
       - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
     depends_on:
+      - mysql-inventory
       - zipkin
       - discovery-server
       - api-gateway
