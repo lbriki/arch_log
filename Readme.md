@@ -1,4 +1,4 @@
-# Micro Marketplace: An E-commerce Microservices Application
+# Microservices Application Using Eureka Server
 
 ## Solution Overview
 
